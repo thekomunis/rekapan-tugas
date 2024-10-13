@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekapan Tugas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        table {
+            width: 70%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            float: left;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        button {
+            padding: 6px 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .add-btn {
+            background-color: #28a745;
+            color: white;
+            margin-top: 10px;
+            display: block;
+            font-size: 14px;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        form div {
+            margin-bottom: 10px;
+        }
+        input, select {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        #filterSection {
+            width: 28%;
+            float: right;
+            margin-left: 20px;
+        }
+        #filterSection label {
+            margin-right: 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        #filterMataKuliah {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Input Rekapan Tugas</h2>
+
+    <form id="tugasForm">
+        <div>
+            <label for="hari">Hari:</label>
+            <input type="text" id="hari" name="hari" required>
+        </div>
+        <div>
+            <label for="dosen">Nama Dosen:</label>
+            <input type="text" id="dosen" name="dosen" required>
+        </div>
+        <div>
+            <label for="mataKuliah">Mata Kuliah:</label>
+            <input type="text" id="mataKuliah" name="mataKuliah" required>
+        </div>
+        <div>
+            <label for="tugas">Tugas:</label>
+            <input type="text" id="tugas" name="tugas" required>
+        </div>
+        <div>
+            <label for="deadline">Deadline:</label>
+            <input type="date" id="deadline" name="deadline" required>
+        </div>
+        <div>
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="Belum Selesai">Belum Selesai</option>
+                <option value="Selesai">Selesai</option>
+            </select>
+        </div>
+        <button type="submit" class="add-btn">Tambah Tugas</button>
+    </form>
+
+    <h2>Rekapan Tugas</h2>
+
+    <div style="display: flex; justify-content: space-between;">
+        <table id="rekapanTugas">
+            <thead>
+                <tr>
+                    <th>Hari</th>
+                    <th>Nama Dosen</th>
+                    <th>Mata Kuliah</th>
+                    <th>Tugas</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Senin</td>
+                    <td>Dr. John Doe</td>
+                    <td>Akuntansi Keuangan</td>
+                    <td>Makalah Laporan Keuangan</td>
+                    <td>2024-10-15</td>
+                    <td>Belum Selesai</td>
+                    <td>
+                        <button class="edit-btn" onclick="editRow(this)">Edit</button>
+                        <button class="delete-btn" onclick="deleteRow(this)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Filter Section: Beside the table -->
+        <div id="filterSection">
+            <label for="filterMataKuliah">Filter Mata Kuliah:</label>
+            <select id="filterMataKuliah">
+                <option value="all">Semua Mata Kuliah</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        let editingRow = null;
+
+        // Function to add a new row to the table
+        document.getElementById('tugasForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent page refresh
+
+            const hari = document.getElementById('hari').value;
+            const dosen = document.getElementById('dosen').value;
+            const mataKuliah = document.getElementById('mataKuliah').value;
+            const tugas = document.getElementById('tugas').value;
+            const deadline = document.getElementById('deadline').value;
+            const status = document.getElementById('status').value;
+
+            if (editingRow) {
+                // Edit existing row
+                editingRow.cells[0].textContent = hari;
+                editingRow.cells[1].textContent = dosen;
+                editingRow.cells[2].textContent = mataKuliah;
+                editingRow.cells[3].textContent = tugas;
+                editingRow.cells[4].textContent = deadline;
+                editingRow.cells[5].textContent = status;
+                editingRow = null;
+            } else {
+                // Create new row
+                const table = document.getElementById('rekapanTugas').getElementsByTagName('tbody')[0];
+                const newRow = table.insertRow();
+
+                newRow.insertCell(0).textContent = hari;
+                newRow.insertCell(1).textContent = dosen;
+                newRow.insertCell(2).textContent = mataKuliah;
+                newRow.insertCell(3).textContent = tugas;
+                newRow.insertCell(4).textContent = deadline;
+                newRow.insertCell(5).textContent = status;
+
+                const actionCell = newRow.insertCell(6);
+                actionCell.innerHTML = `<button class="edit-btn" onclick="editRow(this)">Edit</button> 
+                                        <button class="delete-btn" onclick="deleteRow(this)">Delete</button>`;
+
+                // Update Mata Kuliah filter options
+                updateFilterOptions();
+            }
+
+            document.getElementById('tugasForm').reset();
+        });
+
+        // Function to edit a row
+        function editRow(btn) {
+            editingRow = btn.parentElement.parentElement;
+
+            document.getElementById('hari').value = editingRow.cells[0].textContent;
+            document.getElementById('dosen').value = editingRow.cells[1].textContent;
+            document.getElementById('mataKuliah').value = editingRow.cells[2].textContent;
+            document.getElementById('tugas').value = editingRow.cells[3].textContent;
+            document.getElementById('deadline').value = editingRow.cells[4].textContent;
+            document.getElementById('status').value = editingRow.cells[5].textContent;
+        }
+
+        // Function to delete a row
+        function deleteRow(btn) {
+            const row = btn.parentElement.parentElement;
+            row.remove();
+            updateFilterOptions();
+        }
+
+        // Function to update the Mata Kuliah filter dropdown
+        function updateFilterOptions() {
+            const tableRows = document.getElementById('rekapanTugas').getElementsByTagName('tbody')[0].rows;
+            const mataKuliahSet = new Set();
+
+            // Always include 'all' as an option
+            mataKuliahSet.add('all');
+
+            for (let row of tableRows) {
+                mataKuliahSet.add(row.cells[2].textContent);
+            }
+
+            const filterSelect = document.getElementById('filterMataKuliah');
+            filterSelect.innerHTML = '';
+
+            mataKuliahSet.forEach(mataKuliah => {
+                const option = document.createElement('option');
+                option.value = mataKuliah;
+                option.textContent = mataKuliah === 'all' ? 'Semua Mata Kuliah' : mataKuliah;
+                filterSelect.appendChild(option);
+            });
+        }
+
+        // Function to filter the table by Mata Kuliah
+        document.getElementById('filterMataKuliah').addEventListener('change', function() {
+            const selectedMataKuliah = this.value;
+            const tableRows = document.getElementById('rekapanTugas').getElementsByTagName('tbody')[0].rows;
+
+            for (let row of tableRows) {
+                if (selectedMataKuliah === 'all' || row.cells[2].textContent === selectedMataKuliah) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+
+        // Initial filter options update
+        updateFilterOptions();
+    </script>
+
+</body>
+</html>
